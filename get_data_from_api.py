@@ -17,7 +17,8 @@ async def fetch_all(urls, loop):
 
 
 def get_data_from_api():
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     urls = URLS
     htmls = loop.run_until_complete(fetch_all(urls, loop))
     result = []

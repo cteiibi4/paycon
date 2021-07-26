@@ -1,8 +1,8 @@
-import time
+import threading
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GObject, GLib
 from get_data_from_api import get_data_from_api
 from get_data_from_csv import get_data_from_csv
 
@@ -34,11 +34,11 @@ class MainWindow(Gtk.Window):
         self.treeview.append_column(column)
 
         button_api = Gtk.Button.new_with_label("Загрузить из API")
-        button_api.connect("clicked", self.api_button_clicked)
+        button_api.connect("clicked", self.button_clicked, get_data_from_api)
         grid.add(button_api)
 
         button_file = Gtk.Button.new_with_label("Загрузить из файла")
-        button_file.connect("clicked", self.file_button_clicked)
+        button_file.connect("clicked", self.button_clicked, get_data_from_csv)
         grid.attach(button_file, 1, 0, 1, 1)
         self.scrollable_treelist = Gtk.ScrolledWindow()
         self.scrollable_treelist.set_vexpand(True)
@@ -53,17 +53,20 @@ class MainWindow(Gtk.Window):
             i = [product]
             self.software_liststore.append(i)
 
-    def api_button_clicked(self, widget):
+    def button_clicked(self, widget, func):
         dialog = DialogSpinner(self)
-        dialog.start()
-        self.append_data_in_software_list(get_data_from_api())
-        dialog.destroy()
+        dialog.show_all()
 
-    def file_button_clicked(self, widget):
-        dialog = DialogSpinner(self)
-        dialog.start()
-        self.append_data_in_software_list(get_data_from_csv())
-        dialog.destroy()
+        def thread_run():
+            self.append_data_in_software_list(func())
+            GLib.idle_add(cleanup)
+
+        def cleanup():
+            dialog.destroy()
+            t.join()
+
+        t = threading.Thread(target=thread_run, args=[])
+        t.start()
 
 
 class DialogSpinner(Gtk.Dialog):
