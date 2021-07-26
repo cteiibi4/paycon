@@ -41,6 +41,8 @@ class MainWindow(Gtk.Window):
         button_file.connect("clicked", self.button_clicked, get_data_from_csv)
         grid.attach(button_file, 1, 0, 1, 1)
         self.scrollable_treelist = Gtk.ScrolledWindow()
+        self.scrollable_treelist.set_policy(Gtk.PolicyType.EXTERNAL,
+                                       Gtk.PolicyType.EXTERNAL)
         self.scrollable_treelist.set_vexpand(True)
         grid.attach_next_to(self.scrollable_treelist, button_api, Gtk.PositionType.BOTTOM, 2, 2)
         self.scrollable_treelist.add(self.treeview)
