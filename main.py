@@ -4,6 +4,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk
 from get_data_from_api import get_data_from_api
+from get_data_from_csv import get_data_from_csv
 
 
 class MainWindow(Gtk.Window):
@@ -46,17 +47,23 @@ class MainWindow(Gtk.Window):
 
         self.show_all()
 
-    def api_button_clicked(self, widget):
-        dialog = DialogSpinner(self)
-        dialog.start()
-        self.download_list = get_data_from_api()
+    def append_data_in_software_list(self, data):
+        self.download_list = data
         for product in self.download_list:
             i = [product]
             self.software_liststore.append(i)
+
+    def api_button_clicked(self, widget):
+        dialog = DialogSpinner(self)
+        dialog.start()
+        self.append_data_in_software_list(get_data_from_api())
         dialog.destroy()
 
     def file_button_clicked(self, widget):
-        print("FILE")
+        dialog = DialogSpinner(self)
+        dialog.start()
+        self.append_data_in_software_list(get_data_from_csv())
+        dialog.destroy()
 
 
 class DialogSpinner(Gtk.Dialog):
