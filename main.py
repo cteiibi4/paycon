@@ -3,6 +3,8 @@ import gi
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk
+from get_data_from_api import get_data_from_api
+
 
 class MainWindow(Gtk.Window):
 
@@ -14,7 +16,7 @@ class MainWindow(Gtk.Window):
         hints = Gdk.WindowHints(Gdk.WindowHints.MAX_SIZE)
         self.set_geometry_hints(None, geometry, hints)
         self.set_border_width(10)
-        self.download_list = ["asd", "asdd", "asddasd", "1", "фывфывф"]
+        self.download_list = []
         grid = Gtk.Grid()
         grid.set_column_homogeneous(True)
         grid.set_row_homogeneous(True)
@@ -46,7 +48,11 @@ class MainWindow(Gtk.Window):
 
     def api_button_clicked(self, widget):
         dialog = DialogSpinner(self)
-        dialog.run()
+        dialog.start()
+        self.download_list = get_data_from_api()
+        for product in self.download_list:
+            i = [product]
+            self.software_liststore.append(i)
         dialog.destroy()
 
     def file_button_clicked(self, widget):
